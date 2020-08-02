@@ -21,7 +21,7 @@ app.get('/obtener/:idCategoria', (req, res) => {
             return res.status(404).json({
                 ok: false,
                 status: 404,
-                msg: 'Esta categoria no existe en la base de datos o no tiene platillos',
+                msg: 'Esta categoría no tiene platillos registrados',
             });
         }
         return res.status(200).json({
@@ -44,21 +44,22 @@ app.get('/obtener/:idCategoria', (req, res) => {
 //|-------------Api GET Obtener los platillos por id---------------------|
 //| Creada por: NNAV                                                     |
 //| Fecha: 30/07/2020                                                    |
-//| Api que obtiene/filtra platillos por categoria                       |
+//| Api que obtiene/filtra platillos                                     |
 //| modificada por:                                                      |
 //| Fecha de modificacion:                                               |
 //| cambios:                                                             |
-//| Ruta: http://localhost:3000/api/platillo/obtener/:idCategoria        |
+//| Ruta: http://localhost:3000/api/platillo/obtener/:idPlatillo         |
 //|----------------------------------------------------------------------|
 
-app.get('/obtener/:idCategoria/:idPlatillo', (req, res) => {
+app.get('/obtener/platillo/:idPlatillo', (req, res) => {
     let idPlatillo = req.params.idPlatillo;
-    Platillo.findOne({ idCategoria: req.params.idCategoria, _id: idPlatillo }).then((platillo) => {
+    Platillo.find({ _id: idPlatillo }).then((platillo) => {
+
         if (platillo.length <= 0) {
             return res.status(404).json({
                 ok: false,
                 status: 404,
-                msg: 'Esta categoria no existe en la base de datos o no existe el platillo',
+                msg: 'Este platillo no existe en la base de datos',
             });
         }
         return res.status(200).json({
@@ -171,7 +172,7 @@ app.put('/modificar/:idPlatillo', (req, res) => {
 
     var regex = new RegExp(["^", body.strNombre, "$"].join(""), "i");
 
-    Platillo.find({ 'strNombre': regex }).then((data) => {
+    Platillo.find({ 'strNombre': regex, 'strDescripcion': body.strDescripcion, 'strIngredientes': body.strIngredientes, 'nmbPiezas': body.nmbPiezas, 'nmbPrecio': body.nmbPrecio, 'blnActivo': body.blnActivo }).then((data) => {
 
         if (data.length > 0) {
             return res.status(400).json({
@@ -247,7 +248,7 @@ app.delete('/eliminar/:idPlatillo', (req, res) => {
 //| Ruta: http://localhost:3000/api/platillo/activar/:idPlatillo         |
 //|----------------------------------------------------------------------|
 
-app.put('/activar/:idPlatillo', (req, res) => {
+app.delete('/activar/:idPlatillo', (req, res) => {
     let id = req.params.idPlatillo;
 
     Platillo.findByIdAndUpdate(id, { blnActivo: true }, { new: true, runValidators: true, context: 'query' }).then((resp) => {

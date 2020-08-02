@@ -21,7 +21,7 @@ app.get('/obtener', (req, res) => {
             return res.status(404).json({
                 ok: false,
                 status: 404,
-                msg: 'No existen categorias registrados',
+                msg: 'No existen categorias registradas',
             });
         }
 
@@ -110,11 +110,11 @@ app.post('/registrar', (req, res) => {
         }
 
         strNombre = body.strNombre.replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
-        strDescripcion = body.strDescripcion.replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); });
+
 
         let categoria = new Categoria({
             strNombre: strNombre,
-            strDescripcion: strDescripcion,
+            strDescripcion: body.strDescripcion,
             blnActivo: body.blnActivo
         });
 
@@ -124,7 +124,7 @@ app.post('/registrar', (req, res) => {
                 return res.status(400).json({
                     ok: false,
                     status: 400,
-                    msg: 'Esta categoria ya existe'
+                    msg: 'Esta categoría ya existe'
                 });
             }
 
@@ -132,14 +132,14 @@ app.post('/registrar', (req, res) => {
                 return res.status(200).json({
                     ok: true,
                     resp: 200,
-                    msg: 'Se ha registrado correctamente la categoria',
+                    msg: 'Se ha registrado correctamente la categoría',
                     cont: categoriaDB
                 });
             }).catch((err) => {
                 return res.status(400).json({
                     ok: false,
                     resp: 400,
-                    msg: 'Error al registrar la categoria',
+                    msg: 'Error al registrar la categoría',
                     err: Object.keys(err).length === 0 ? err.message : err
                 });
             })
@@ -173,7 +173,7 @@ app.put('/modificar/:idCategoria', (req, res) => {
 
     var regex = new RegExp(["^", body.strNombre, "$"].join(""), "i");
 
-    Categoria.find({ 'strNombre': regex }).then((data) => {
+    Categoria.find({ 'strNombre': regex, 'strDescripcion': body.strDescripcion, 'blnActivo': body.blnActivo }).then((data) => {
 
         if (data.length > 0) {
             return res.status(400).json({
@@ -194,7 +194,7 @@ app.put('/modificar/:idCategoria', (req, res) => {
             return res.status(400).json({
                 ok: false,
                 resp: 400,
-                msg: 'Error al intentar actualizar la categoria',
+                msg: 'Error al intentar actualizar la categoría',
                 err: Object.keys(err).length === 0 ? err.message : err
             });
         })
@@ -226,7 +226,7 @@ app.delete('/eliminar/:idCategoria', (req, res) => {
         return res.status(200).json({
             ok: true,
             status: 200,
-            msg: 'Se ha desactivado correctamente la categoria',
+            msg: 'Se ha desactivado correctamente la categoría',
             cont: resp
         });
     }).catch((err) => {
@@ -248,14 +248,14 @@ app.delete('/eliminar/:idCategoria', (req, res) => {
 //| Ruta: http://localhost:3000/api/categoria/Activar/:idCategoria       |
 //|----------------------------------------------------------------------|
 
-app.put('/activar/:idCategoria', (req, res) => {
+app.delete('/activar/:idCategoria', (req, res) => {
     let id = req.params.idCategoria;
 
     Categoria.findByIdAndUpdate(id, { blnActivo: true }, { new: true, runValidators: true, context: 'query' }).then((resp) => {
         return res.status(200).json({
             ok: true,
             status: 200,
-            msg: 'Se ha activado correctamente la categoria',
+            msg: 'Se ha activado correctamente la categoría',
             cont: resp
         });
     }).catch((err) => {
